@@ -178,6 +178,7 @@ export function EigenfacesDemo() {
                       className="tile-activator"
                       aria-label={`Reveal principal component ${component.index} weight control`}
                       aria-expanded={activeTile === index}
+                      onFocus={() => setActiveTile(index)}
                       onClick={() => setActiveTile(index)}
                     />
                     <div className="weight-control">

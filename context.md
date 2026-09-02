@@ -25,6 +25,8 @@ The page is an interaction-led educational working surface. It should let a visi
 ### Component interaction
 
 - PC tiles enlarge with a small transform on hover or focus; surrounding layout dimensions remain fixed.
+- Clicking a PC tile selects it with a slightly stronger eased scale increase and dissolves its control into view. Selecting another PC eases the previous tile back to rest.
+- Use a restrained 6px corner radius on the reconstruction and face tiles.
 - Reveal a translucent control surface over the lower half of an active tile. Preserve enough of the eigenface above and around it to connect the control to the image.
 - Use a native range input. Pointer and touch changes update the reconstruction immediately.
 - Display weights in standard-deviation units for human readability: `z_i = w_i / sqrt(lambda_i)`. The stored calculation continues to use raw PCA weights.
