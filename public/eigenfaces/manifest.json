@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "dataset": "Flickr-Faces-HQ (FFHQ)",
+  "datasetUrl": "https://github.com/NVlabs/ffhq-dataset",
+  "seed": 20260902,
+  "sampleCount": 5000,
+  "width": 128,
+  "height": 128,
+  "flatteningOrder": "row-major",
+  "grayscale": "sRGB luminance 0.2126R + 0.7152G + 0.0722B",
+  "kFull": 512,
+  "explainedVariance": {
+    "128": 0.8813932538032532,
+    "256": 0.9207804203033447,
+    "512": 0.9507570266723633
+  },
+  "baseline": "/eigenfaces/baseline.f32",
+  "baselineSha256": "a7f8ad705dd82a734a9960785a8874af2afdd4e39eb4b7b77109a55451bc8de9",
+  "mean": "/eigenfaces/mean.png",
+  "input": "/eigenfaces/input.png",
+  "reconstruction": "/eigenfaces/reconstruction.png",
+  "components": [
+    {
+      "index": 1,
+      "eigenvalue": 233.40867614746094,
+      "explainedVariance": 0.2382977306842804,
+      "baselineWeight": 12.636877059936523,
+      "baselineZ": 0.8271442651748657,
+      "vector": "/eigenfaces/pc-01.f32",
+      "vectorSha256": "1d3c1fd31e89cdf3e3277ca899f89fddfbdb3dd985729082d514aef285553747",
+      "thumbnail": "/eigenfaces/pc-01.png"
+    },
+    {
+      "index": 2,
+      "eigenvalue": 81.1632080078125,
+      "explainedVariance": 0.08286327868700027,
+      "baselineWeight": 9.036142349243164,
+      "baselineZ": 1.003005862236023,
+      "vector": "/eigenfaces/pc-02.f32",
+      "vectorSha256": "42fc8b5fad9bf8c551a8b092698fa149e2172612f671ec8b32341c29706466ae",
+      "thumbnail": "/eigenfaces/pc-02.png"
+    },
+    {
+      "index": 3,
+      "eigenvalue": 79.0069580078125,
+      "explainedVariance": 0.08066186308860779,
+      "baselineWeight": -4.4919304847717285,
+      "baselineZ": -0.505359411239624,
+      "vector": "/eigenfaces/pc-03.f32",
+      "vectorSha256": "d41e054d3dd9dcf62d5354d2cd81c2749c23d2546962be570e635e9e403c6147",
+      "thumbnail": "/eigenfaces/pc-03.png"
+    },
+    {
+      "index": 4,
+      "eigenvalue": 59.16999053955078,
+      "explainedVariance": 0.060409385710954666,
+      "baselineWeight": -8.545804977416992,
+      "baselineZ": -1.1109697818756104,
+      "vector": "/eigenfaces/pc-04.f32",
+      "vectorSha256": "e6b64e2d933bb5ad6f5890566ead6e5b0c4fa0771c7b403732faf221b1176595",
+      "thumbnail": "/eigenfaces/pc-04.png"
+    },
+    {
+      "index": 5,
+      "eigenvalue": 39.0621337890625,
+      "explainedVariance": 0.03988034278154373,
+      "baselineWeight": -4.8963141441345215,
+      "baselineZ": -0.7834138870239258,
+      "vector": "/eigenfaces/pc-05.f32",
+      "vectorSha256": "d18c4d4ff51587b5d8c091e845fdb965aa191bab50dc2d93bbaf04e28c577412",
+      "thumbnail": "/eigenfaces/pc-05.png"
+    },
+    {
+      "index": 6,
+      "eigenvalue": 38.228965759277344,
+      "explainedVariance": 0.03902972489595413,
+      "baselineWeight": 0.43159690499305725,
+      "baselineZ": 0.06980428099632263,
+      "vector": "/eigenfaces/pc-06.f32",
+      "vectorSha256": "591135ec0fdd06da02acda4db96ff75c4af72b0c237017a1877079b329c29a14",
+      "thumbnail": "/eigenfaces/pc-06.png"
+    },
+    {
+      "index": 7,
+      "eigenvalue": 27.46504020690918,
+      "explainedVariance": 0.028040332719683647,
+      "baselineWeight": 3.1383252143859863,
+      "baselineZ": 0.5988358855247498,
+      "vector": "/eigenfaces/pc-07.f32",
+      "vectorSha256": "bd0177d47d32feab900b63aa38d8fd6fcc784301e42a8802c15805e24475bad2",
+      "thumbnail": "/eigenfaces/pc-07.png"
+    },
+    {
+      "index": 8,
+      "eigenvalue": 20.672521591186523,
+      "explainedVariance": 0.021105535328388214,
+      "baselineWeight": 4.292476177215576,
+      "baselineZ": 0.9440851807594299,
+      "vector": "/eigenfaces/pc-08.f32",
+      "vectorSha256": "0a8d5011762ce5971fc80d65d29b96a69335c7f1a8387b0371448dc84543fb02",
+      "thumbnail": "/eigenfaces/pc-08.png"
+    }
+  ],
+  "portraitAlignment": {
+    "rotationDegrees": -4.5,
+    "rotationCenter": [
+      457,
+      500
+    ],
+    "crop": [
+      80,
+      80,
+      834,
+      834
+    ],
+    "sourceSize": [
+      914,
+      1003
+    ]
+  }
+}

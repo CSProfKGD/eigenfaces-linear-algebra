@@ -1,0 +1,17 @@
+Flickr-Faces-HQ (FFHQ) attribution
+
+This non-commercial educational visualization uses a deterministic sample of
+FFHQ aligned 128 × 128 thumbnails to derive an average face and PCA basis.
+The source images were converted to grayscale and the displayed artifacts are
+derived reconstructions and principal components.
+
+Dataset: https://github.com/NVlabs/ffhq-dataset
+
+Citation:
+Tero Karras, Samuli Laine, and Timo Aila. “A Style-Based Generator
+Architecture for Generative Adversarial Networks.” CVPR 2019.
+
+FFHQ is distributed under CC BY-NC-SA 4.0. Individual source photographs
+retain their original licenses and attribution requirements. The complete
+selected-record provenance manifest is produced by the offline build pipeline
+and retained outside the public web bundle.
