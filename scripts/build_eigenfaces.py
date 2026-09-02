@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import html
 import io
@@ -23,8 +24,9 @@ from sklearn.decomposition import PCA
 SEED = 20260902
 SIZE = 128
 SAMPLE_COUNT = 5000
-MAX_COMPONENTS = 512
-CHECKPOINTS = (128, 256, 512)
+DEFAULT_COMPONENTS = 512
+MAX_COMPONENTS = 1000
+CHECKPOINTS = (128, 256, 512, 1000)
 PORTRAIT_LANDMARKS = {
     "eyeLeft": [423.0, 449.0],
     "eyeRight": [586.0, 465.0],
@@ -295,7 +297,7 @@ def main() -> None:
         for index, key in enumerate(selected_ids):
             matrix[index] = load_gray(downloaded[key]).reshape(-1)
 
-    print("Fitting 512-component randomized PCA…", flush=True)
+    print("Fitting 1000-component randomized PCA…", flush=True)
     pca = PCA(
         n_components=MAX_COMPONENTS,
         svd_solver="randomized",
@@ -311,17 +313,40 @@ def main() -> None:
             components[index] *= -1
 
     cumulative = np.cumsum(pca.explained_variance_ratio_)
-    k_full = MAX_COMPONENTS
-    for checkpoint in CHECKPOINTS:
-        if cumulative[checkpoint - 1] >= 0.95:
-            k_full = checkpoint
-            break
-
     portrait_image, alignment_quad = align_portrait(args.portrait, args.cache)
     portrait = portrait_image.reshape(-1)
     centered = portrait - pca.mean_.astype(np.float32)
-    weights = components[:k_full] @ centered
-    baseline = pca.mean_.astype(np.float32) + components[:k_full].T @ weights
+    weights = components @ centered
+    baseline = (
+        pca.mean_.astype(np.float32)
+        + components[:DEFAULT_COMPONENTS].T @ weights[:DEFAULT_COMPONENTS]
+    )
+
+    # Cache the complete fitted basis and projection offline. The browser uses a
+    # compact table of quantized prefix reconstructions so changing k only selects
+    # a precomputed projection; PCA is never refit during interaction.
+    write_float32(args.cache / "components-1000.f32", components)
+    write_float32(args.cache / "portrait-weights-1000.f32", weights)
+    prefix_reconstructions = np.empty(
+        (MAX_COMPONENTS, SIZE * SIZE), dtype=np.uint8
+    )
+    running = pca.mean_.astype(np.float32).copy()
+    for index in range(MAX_COMPONENTS):
+        running += components[index] * weights[index]
+        prefix_reconstructions[index] = np.rint(
+            np.clip(running, 0.0, 1.0) * 255.0
+        ).astype(np.uint8)
+    prefix_deltas = np.empty_like(prefix_reconstructions)
+    prefix_deltas[0] = prefix_reconstructions[0]
+    prefix_deltas[1:] = (
+        prefix_reconstructions[1:].astype(np.int16)
+        - prefix_reconstructions[:-1].astype(np.int16)
+    ) % 256
+    prefix_path = args.output / "prefix-reconstructions.delta.bin"
+    prefix_path.write_bytes(gzip.compress(prefix_deltas.tobytes(), compresslevel=9, mtime=0))
+    (args.output / "prefix-reconstructions.u8").unlink(missing_ok=True)
+    (args.output / "prefix-reconstructions.delta.u8.gz").unlink(missing_ok=True)
+    prefix_sha = hashlib.sha256(prefix_path.read_bytes()).hexdigest()
 
     save_gray(args.output / "mean.png", pca.mean_.reshape(SIZE, SIZE))
     save_gray(args.output / "reconstruction.png", baseline.reshape(SIZE, SIZE))
@@ -373,13 +398,19 @@ def main() -> None:
         "height": SIZE,
         "flatteningOrder": "row-major",
         "grayscale": "sRGB luminance 0.2126R + 0.7152G + 0.0722B",
-        "kFull": k_full,
+        "kFull": DEFAULT_COMPONENTS,
+        "defaultDimensions": DEFAULT_COMPONENTS,
+        "maxDimensions": MAX_COMPONENTS,
         "explainedVariance": {
             str(checkpoint): float(cumulative[checkpoint - 1])
             for checkpoint in CHECKPOINTS
         },
+        "cumulativeExplainedVariance": [float(value) for value in cumulative],
         "baseline": "/eigenfaces/baseline.f32",
         "baselineSha256": baseline_sha,
+        "prefixReconstructions": f"/eigenfaces/{prefix_path.name}",
+        "prefixReconstructionsSha256": prefix_sha,
+        "prefixEncoding": "gzip-delta-uint8-clamped-row-major",
         "mean": "/eigenfaces/mean.png",
         "reconstruction": "/eigenfaces/reconstruction.png",
         "components": component_records,
@@ -392,7 +423,8 @@ def main() -> None:
     }
     (args.output / "manifest.json").write_text(json.dumps(manifest, indent=2))
     print(
-        f"Wrote assets with K_full={k_full}; variance@512={cumulative[511]:.4f}",
+        f"Wrote assets with default={DEFAULT_COMPONENTS}, max={MAX_COMPONENTS}; "
+        f"variance@512={cumulative[511]:.4f}; variance@1000={cumulative[999]:.4f}",
         flush=True,
     )
 

@@ -14,8 +14,9 @@ The eventual site is for non-commercial educational use. Follow the FFHQ attribu
 - The left side contains one large reconstructed-face stage.
 - The upper-left hero reads `Eigenfaces` with the subtitle `Face It: It’s Just Linear Algebra`.
 - The right side contains a balanced 3 × 3 tile grid: the average face first, followed by eigenfaces 1–8 in decreasing explained-variance order.
+- Vertically center the complete component heading and 3 × 3 grid against the reconstruction figure on desktop.
 - The average-face tile is informational and never presents a weight control.
-- The eight eigenface tiles are the only exposed component controls. The reconstruction itself must use the larger basis selected by the offline pipeline; never reconstruct from only the eight visible components.
+- The eight eigenface tiles are the only exposed weight controls. A separate dimensions control selects a reconstruction prefix from 1–1000 components and defaults to 512; never reconstruct from only the eight visible components.
 - On narrow screens, present the hero first at the top-left, followed by the reconstruction and component grid. Reflow the grid without horizontal scrolling.
 
 ## Interaction model
@@ -26,12 +27,13 @@ The eventual site is for non-commercial educational use. Follow the FFHQ attribu
 - Show the current signed weight in a compact tabular-numeral readout.
 - Provide one quiet reset action that restores all eight exposed weights to their original projected values.
 - Reset must restore the exact baseline reconstruction. It must not re-run PCA or modify hidden weights.
+- The dimensions value reveals a minimal 1–1000 range control on hover, focus, or tap. It updates the reconstruction and actual cumulative explained variance immediately and defaults to 512.
 - Keep the initial page completely still. Motion should clarify focus or state and must respect `prefers-reduced-motion`.
 
 ## Architecture boundaries
 
 - Keep dataset acquisition, portrait preprocessing, PCA fitting, component selection, projection, and asset export in an offline pipeline.
-- Keep the browser experience deterministic and static: load precomputed assets, retain the eight adjustable weights in local React state, and render the reconstruction from the baseline plus component deltas.
+- Keep the browser experience deterministic and static: load precomputed prefix reconstructions, retain the selected prefix and eight adjustable weights in local React state, and render from the selected prefix plus applicable exposed-component deltas.
 - Do not download FFHQ, fit PCA, detect landmarks, or process the source HEIC in the browser.
 - Treat `context.md` as the source of truth for preprocessing, PCA math, selected-component rules, and generated asset contracts.
 - Centralize reconstruction math in a framework-independent module. UI components must not independently implement PCA calculations.

@@ -24,8 +24,12 @@ type Manifest = {
   width: number;
   height: number;
   kFull: number;
+  defaultDimensions: number;
+  maxDimensions: number;
   explainedVariance: Record<string, number>;
+  cumulativeExplainedVariance: number[];
   baseline: string;
+  prefixReconstructions: string;
   mean: string;
   reconstruction: string;
   components: ComponentRecord[];
@@ -34,6 +38,7 @@ type Manifest = {
 type LoadedModel = {
   manifest: Manifest;
   baseline: Float32Array;
+  prefixReconstructions: Uint8Array;
   vectors: Float32Array[];
 };
 
@@ -58,9 +63,27 @@ async function fetchFloat32(url: string) {
   return new Float32Array(await response.arrayBuffer());
 }
 
+async function fetchUint8(url: string) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Could not load ${url}`);
+  if (!url.endsWith('.bin')) return new Uint8Array(await response.arrayBuffer());
+  const decompressed = response.body?.pipeThrough(new DecompressionStream('gzip'));
+  if (!decompressed) throw new Error(`Could not decompress ${url}`);
+  return new Uint8Array(await new Response(decompressed).arrayBuffer());
+}
+
+function decodePrefixDeltas(payload: Uint8Array, pixelCount: number) {
+  for (let offset = pixelCount; offset < payload.length; offset += 1) {
+    payload[offset] = (payload[offset] + payload[offset - pixelCount]) & 0xff;
+  }
+  return payload;
+}
+
 export function EigenfacesDemo() {
   const [model, setModel] = useState<LoadedModel | null>(null);
   const [zValues, setZValues] = useState<number[]>([]);
+  const [dimensions, setDimensions] = useState(512);
+  const [dimensionsOpen, setDimensionsOpen] = useState(false);
   const [activeTile, setActiveTile] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -72,17 +95,24 @@ export function EigenfacesDemo() {
         const manifestResponse = await fetch('/eigenfaces/manifest.json');
         if (!manifestResponse.ok) throw new Error('The eigenspace is unavailable.');
         const manifest = (await manifestResponse.json()) as Manifest;
-        const [baseline, ...vectors] = await Promise.all([
+        const [baseline, prefixReconstructions, ...vectors] = await Promise.all([
           fetchFloat32(manifest.baseline),
+          fetchUint8(manifest.prefixReconstructions),
           ...manifest.components.map((component) => fetchFloat32(component.vector)),
         ]);
         const expectedLength = manifest.width * manifest.height;
-        if (baseline.length !== expectedLength || vectors.some((vector) => vector.length !== expectedLength)) {
+        if (
+          baseline.length !== expectedLength ||
+          prefixReconstructions.length !== expectedLength * manifest.maxDimensions ||
+          vectors.some((vector) => vector.length !== expectedLength)
+        ) {
           throw new Error('The eigenspace data has an unexpected size.');
         }
+        decodePrefixDeltas(prefixReconstructions, expectedLength);
         if (!cancelled) {
-          setModel({ manifest, baseline, vectors });
+          setModel({ manifest, baseline, prefixReconstructions, vectors });
           setZValues(manifest.components.map((component) => component.baselineZ));
+          setDimensions(manifest.defaultDimensions);
         }
       } catch (reason) {
         if (!cancelled) {
@@ -102,28 +132,41 @@ export function EigenfacesDemo() {
     });
   }, [model, zValues]);
 
+  const selectedPrefix = useMemo(() => {
+    if (!model) return null;
+    if (dimensions === model.manifest.defaultDimensions) {
+      return model.baseline;
+    }
+    const pixelCount = model.manifest.width * model.manifest.height;
+    const offset = (dimensions - 1) * pixelCount;
+    const result = new Float32Array(pixelCount);
+    for (let pixel = 0; pixel < pixelCount; pixel += 1) {
+      result[pixel] = model.prefixReconstructions[offset + pixel] / 255;
+    }
+    return result;
+  }, [dimensions, model]);
+
   useEffect(() => {
-    if (!model || rawWeights.length === 0 || !canvasRef.current) return;
+    if (!model || !selectedPrefix || rawWeights.length === 0 || !canvasRef.current) return;
     const frame = requestAnimationFrame(() => {
       const values = reconstructFace(
-        model.baseline,
+        selectedPrefix,
         model.vectors,
         rawWeights,
         model.manifest.components.map((component) => component.baselineWeight),
+        dimensions,
       );
       if (canvasRef.current) drawLuminance(canvasRef.current, values, model.manifest.width, model.manifest.height);
     });
     return () => cancelAnimationFrame(frame);
-  }, [model, rawWeights]);
+  }, [dimensions, model, rawWeights, selectedPrefix]);
 
   const reset = useCallback(() => {
     if (model) setZValues(model.manifest.components.map((component) => component.baselineZ));
   }, [model]);
 
   const hasChanges = Boolean(model && zValues.some((value, index) => Math.abs(value - model.manifest.components[index].baselineZ) > 0.001));
-  const variance = model
-    ? model.manifest.explainedVariance[String(model.manifest.kFull)] ?? model.manifest.explainedVariance['512']
-    : null;
+  const variance = model?.manifest.cumulativeExplainedVariance[dimensions - 1] ?? null;
 
   return (
     <main className="eigenfaces-page">
@@ -137,6 +180,39 @@ export function EigenfacesDemo() {
         <figure className="reconstruction-figure">
           <figcaption className="figure-topline">
             <span className="eyebrow">Reconstruction</span>
+            <div
+              className={`dimensions-control${dimensionsOpen ? ' is-open' : ''}`}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) setDimensionsOpen(false);
+              }}
+            >
+              <div className="dimensions-slider-shell">
+                <span>1</span>
+                <Slider
+                  aria-label="Number of principal components used in the reconstruction"
+                  min={1}
+                  max={model?.manifest.maxDimensions ?? 1000}
+                  step={1}
+                  value={[dimensions]}
+                  disabled={!model}
+                  onValueChange={(next) => {
+                    const nextValue = Array.isArray(next) ? next[0] : next;
+                    setDimensions(Math.round(nextValue));
+                  }}
+                />
+                <span>{model?.manifest.maxDimensions ?? 1000}</span>
+              </div>
+              <button
+                type="button"
+                className="dimensions-trigger"
+                aria-expanded={dimensionsOpen}
+                aria-label={`${dimensions} ${dimensions === 1 ? 'dimension' : 'dimensions'}. Adjust reconstruction dimensions`}
+                onFocus={() => setDimensionsOpen(true)}
+                onClick={() => setDimensionsOpen((open) => !open)}
+              >
+                {dimensions} {dimensions === 1 ? 'dimension' : 'dimensions'}
+              </button>
+            </div>
           </figcaption>
 
           <div className="reconstruction-stage">
@@ -156,7 +232,7 @@ export function EigenfacesDemo() {
         </figure>
 
         <section className="basis-section" aria-labelledby="basis-title">
-            <div className="basis-heading"><h2 id="basis-title">Principal components</h2><p>Hover. Focus. Reshape.</p></div>
+            <div className="basis-heading"><h2 id="basis-title">Principal components</h2></div>
             <div className="component-grid">
               <figure className="component-tile mean-tile">
                 <Image src="/eigenfaces/mean.png" alt="Average face across the FFHQ training sample" width={128} height={128} unoptimized />

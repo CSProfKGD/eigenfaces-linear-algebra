@@ -12,6 +12,7 @@ The page is an interaction-led educational working surface. It should let a visi
   - Title: `Eigenfaces`
   - Subtitle: `Face It: It’s Just Linear Algebra`
 - Place a 3 × 3 grid in the right region. Reading order is `Mean`, `PC 01`, `PC 02`, …, `PC 08`.
+- Vertically center the component heading and full 3 × 3 grid against the reconstruction figure rather than aligning it to the page top.
 - The reconstruction is visually dominant. Component tiles remain large enough for facial structures and positive/negative lobes to be recognizable.
 - The mean tile uses the same visual framing as the eigenface tiles but has no slider or hover affordance.
 
@@ -26,12 +27,14 @@ The page is an interaction-led educational working surface. It should let a visi
 
 - PC tiles enlarge with a small transform on hover or focus; surrounding layout dimensions remain fixed.
 - Clicking a PC tile selects it with a slightly stronger eased scale increase and dissolves its control into view. Selecting another PC eases the previous tile back to rest.
+- Hover disclosure is exclusive: while one PC tile is hovered, every other component control is hidden, including a previously selected tile. The selected control may return when the pointer leaves the component grid.
 - Use a restrained 6px corner radius on the reconstruction and face tiles.
 - Reveal a translucent control surface over the lower half of an active tile. Preserve enough of the eigenface above and around it to connect the control to the image.
 - Use a native range input. Pointer and touch changes update the reconstruction immediately.
 - Display weights in standard-deviation units for human readability: `z_i = w_i / sqrt(lambda_i)`. The stored calculation continues to use raw PCA weights.
 - Each slider spans `z_i,baseline - 3` through `z_i,baseline + 3`, which is equivalent to raw weight bounds `w_i,baseline ± 3 sqrt(lambda_i)`.
 - The reset control restores all eight exposed raw weights to their baseline values in one state update.
+- The reconstruction dimensions value reveals a minimal slider on hover, keyboard focus, or tap. It spans 1–1000 in integer steps, defaults to 512, and updates the displayed prefix and actual cumulative explained variance together.
 
 ## Dataset selection and provenance
 
@@ -81,32 +84,29 @@ Because the portrait includes a broad smile and stronger expression than many tr
 Let `X` be the `5000 × 16384` training matrix, with one grayscale image per row.
 
 1. Compute the per-pixel mean `mu` and center the data: `Xc = X - mu`.
-2. Fit up to 512 principal components with a deterministic randomized or incremental SVD implementation configured with the same seed, `20260902`.
+2. Fit exactly the first 1000 principal components with a deterministic randomized SVD implementation configured with the same seed, `20260902`.
 3. Sort components by descending eigenvalue. Preserve the fitted ordering in every exported artifact.
 4. Canonicalize each eigenvector's otherwise arbitrary sign: locate the element with greatest absolute magnitude and multiply the vector by `-1` when that element is negative. Apply the same sign change to all corresponding projected weights.
-5. Calculate cumulative explained-variance ratios at checkpoints 128, 256, and 512.
-6. Choose `K_full` as the smallest checkpoint whose cumulative explained variance is at least `0.95`. If none qualifies, set `K_full = 512` and record the achieved ratio rather than claiming 95% retention.
-7. Project the processed portrait into the selected basis:
-   `w = U_full @ (x - mu)`.
-8. Compute the complete baseline reconstruction:
-   `r_baseline = mu + U_full.T @ w`.
+5. Calculate and export the actual cumulative explained-variance ratio for every prefix `k = 1…1000`, plus checkpoints 128, 256, 512, and 1000.
+6. Project the processed portrait once into all 1000 components: `w = U_1000 @ (x - mu)`.
+7. Precompute each prefix reconstruction `r_k = mu + U_k.T @ w_k`; the default baseline is `r_512`.
 
-Here, `U_full` has shape `K_full × 16384`, `w` has length `K_full`, and `r_baseline` has length 16,384. Keep unclamped floating-point values for the exported baseline calculation. Clamp only while converting a displayed image to luminance.
+Here, `U_1000` has shape `1000 × 16384`, `w` has length 1000, and every prefix reconstruction has length 16,384. Keep the complete Float32 basis and coefficients in the offline cache. Clamp only the compact browser display prefixes while converting them to luminance.
 
-The eight public controls correspond to components 1–8 by explained variance. Components 9 through `K_full` remain fixed at their projected portrait weights.
+The eight public weight controls correspond to components 1–8 by explained variance. Components 9 through the selected `k` remain fixed at their projected portrait weights; components above `k` are omitted.
 
 ## Browser reconstruction contract
 
-The browser does not need the entire fitted basis. Export the complete baseline plus only the data required for the eight live deltas.
+The browser does not refit PCA. Export compact cached prefix reconstructions for `k = 1…1000`, the exact cumulative explained-variance curve, the Float32 default baseline, and the eight eigenvectors needed for live weight deltas.
 
 For adjustable raw weights `w'_1 … w'_8`, render:
 
-`r_display = clamp(r_baseline + sum((w'_i - w_i) * u_i for i = 1..8), 0, 1)`
+`r_display(k) = clamp(r_k + sum((w'_i - w_i) * u_i for i = 1..min(8,k)), 0, 1)`
 
 This formula is the central invariant. It ensures that:
 
-- all untouched sliders reproduce the full `K_full`-component baseline exactly;
-- hidden components remain present and unchanged;
+- untouched weight sliders reproduce the selected prefix, with `k=512` using the exact Float32 baseline;
+- hidden components through `k` remain present and unchanged;
 - moving one slider changes only its eigenface direction; and
 - reset returns exactly to the original projection.
 
@@ -125,7 +125,8 @@ The exact serialization may follow the generated site scaffold, but the logical 
 - selection seed and selected-record provenance-manifest path;
 - image width, height, grayscale transform, and flattening order;
 - training sample count;
-- `K_full` and cumulative explained variance at 128, 256, 512, and `K_full`;
+- default dimensions 512, maximum dimensions 1000, and the actual cumulative explained variance for every prefix;
+- compact cached prefix-reconstruction payload path, encoding, and checksum;
 - baseline reconstruction payload path and checksum;
 - mean-face display asset path and checksum;
 - component records 1–8, each with eigenvalue, baseline raw weight, baseline standardized weight, raw eigenvector payload path, display-thumbnail path, and checksums;
@@ -144,9 +145,9 @@ The exact serialization may follow the generated site scaffold, but the logical 
 
 ## State model
 
-- Immutable loaded state: manifest, baseline reconstruction, eigenvectors 1–8, eigenvalues, and baseline weights.
-- Mutable UI state: eight adjusted raw weights and the currently revealed tile, if any.
-- Derived state: standardized display values and the current reconstructed luminance buffer.
+- Immutable loaded state: manifest, 1000 cached prefix reconstructions, default baseline, eigenvectors 1–8, eigenvalues, baseline weights, and cumulative explained variance.
+- Mutable UI state: selected dimensions (default 512), eight adjusted raw weights, and currently revealed controls.
+- Derived state: selected prefix, standardized display values, actual retained variance, and current reconstructed luminance buffer.
 - Do not duplicate reconstruction state across the stage and component grid. Both consume the same canonical values.
 - Do not persist adjusted face weights across sessions unless a later product requirement explicitly requests it.
 
@@ -180,14 +181,16 @@ The exact serialization may follow the generated site scaffold, but the logical 
 - The processed portrait is 128 × 128, finite, and uses the same grayscale transform and row-major convention.
 - Eigenvalues are non-increasing and eigenvectors are orthonormal within an explicit floating-point tolerance.
 - Component signs follow the canonical greatest-absolute-element rule.
-- `K_full` follows the 128/256/512 checkpoint rule and the manifest records achieved explained variance.
-- Recomputing the baseline from `mu`, `U_full`, and `w` agrees with the exported baseline within Float32 tolerance.
+- The fit contains 1000 variance-ordered components and the manifest contains 1000 monotonically nondecreasing cumulative explained-variance values.
+- Recomputing the default baseline from `mu`, `U_512`, and `w_512` agrees with the exported baseline within Float32 tolerance.
 
 ### Browser math
 
-- Baseline weights render the exported baseline exactly within Float32 tolerance; the result must not collapse to an eight-component reconstruction.
+- Initial dimensions are 512 and baseline weights render the exported 512-component baseline exactly within Float32 tolerance.
+- The dimensions slider reaches both 1 and 1000; decreasing `k` removes higher component contributions and increasing `k` restores them from the cached projections.
+- Displayed retained variance is read directly from the actual cumulative explained-variance entry for the selected `k` and increases monotonically.
 - Moving only component `i` by delta `d` changes the unclamped buffer by exactly `d * u_i` within tolerance.
-- Hidden components 9 through `K_full` remain represented through the baseline and never change during interaction.
+- Hidden components 9 through the selected `k` remain represented and never change during weight interaction.
 - Reset restores all eight original weights and the exact baseline buffer.
 - Display conversion clamps values below 0 and above 1 without mutating the underlying baseline or component arrays.
 - Corrupt, missing, non-finite, or incorrectly sized assets produce an accessible error state rather than a blank or distorted canvas.

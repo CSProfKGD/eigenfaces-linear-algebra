@@ -41,4 +41,19 @@ describe('reconstructFace', () => {
       ),
     ).toThrow('Every component must match the baseline length.');
   });
+
+  it('applies exposed deltas only when their components are in the selected prefix', () => {
+    const result = reconstructFace(
+      new Float32Array([0.2, 0.4]),
+      [new Float32Array([1, 0]), new Float32Array([0, 1])],
+      [2, 4],
+      [1, 1],
+      1,
+    );
+
+    expect(Array.from(result)).toEqual([
+      expect.closeTo(1.2, 6),
+      expect.closeTo(0.4, 6),
+    ]);
+  });
 });

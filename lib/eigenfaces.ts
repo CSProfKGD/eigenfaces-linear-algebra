@@ -3,6 +3,7 @@ export function reconstructFace(
   vectors: Float32Array[],
   adjustedWeights: number[],
   baselineWeights: number[],
+  includedComponentCount = vectors.length,
 ): Float32Array {
   if (
     vectors.length !== adjustedWeights.length ||
@@ -15,7 +16,11 @@ export function reconstructFace(
   }
 
   const output = new Float32Array(baseline);
-  for (let component = 0; component < vectors.length; component += 1) {
+  const adjustableCount = Math.min(
+    Math.max(0, includedComponentCount),
+    vectors.length,
+  );
+  for (let component = 0; component < adjustableCount; component += 1) {
     const delta = adjustedWeights[component] - baselineWeights[component];
     if (delta === 0) continue;
     const vector = vectors[component];
