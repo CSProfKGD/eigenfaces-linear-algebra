@@ -14,6 +14,7 @@ The page is an interaction-led educational working surface. It should let a visi
 - Place a 3 × 3 grid in the right region. Reading order is `Mean`, `PC 01`, `PC 02`, …, `PC 08`.
 - Vertically center the component heading and full 3 × 3 grid against the reconstruction figure rather than aligning it to the page top.
 - The reconstruction is visually dominant. Component tiles remain large enough for facial structures and positive/negative lobes to be recognizable.
+- Keep the reconstruction topline limited to its section label. Below the image, show matching two-line metric blocks: `Dimensions` above its interactive numeric value first, then `Variance retained` above its percentage. Remove the redundant `Projected from 5,000 faces` footer metric. The dimensions slider discloses to the right of the numeric value so the two live reconstruction metrics read together from left to right.
 - The mean tile uses the same visual framing as the eigenface tiles but has no slider or hover affordance.
 
 ### Responsive layout

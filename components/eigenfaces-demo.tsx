@@ -184,39 +184,6 @@ export function EigenfacesDemo() {
         <figure className="reconstruction-figure">
           <figcaption className="figure-topline">
             <span className="eyebrow">Reconstruction</span>
-            <div
-              className={`dimensions-control${dimensionsOpen ? ' is-open' : ''}`}
-              onBlur={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget)) setDimensionsOpen(false);
-              }}
-            >
-              <div className="dimensions-slider-shell">
-                <span>1</span>
-                <Slider
-                  aria-label="Number of principal components used in the reconstruction"
-                  min={1}
-                  max={model?.manifest.maxDimensions ?? 1000}
-                  step={1}
-                  value={[dimensions]}
-                  disabled={!model}
-                  onValueChange={(next) => {
-                    const nextValue = Array.isArray(next) ? next[0] : next;
-                    setDimensions(Math.round(nextValue));
-                  }}
-                />
-                <span>{model?.manifest.maxDimensions ?? 1000}</span>
-              </div>
-              <button
-                type="button"
-                className="dimensions-trigger"
-                aria-expanded={dimensionsOpen}
-                aria-label={`${dimensions} ${dimensions === 1 ? 'dimension' : 'dimensions'}. Adjust reconstruction dimensions`}
-                onFocus={() => setDimensionsOpen(true)}
-                onClick={() => setDimensionsOpen((open) => !open)}
-              >
-                {dimensions} {dimensions === 1 ? 'dimension' : 'dimensions'}
-              </button>
-            </div>
           </figcaption>
 
           <div className="reconstruction-stage">
@@ -227,8 +194,43 @@ export function EigenfacesDemo() {
           </div>
 
           <div className="reconstruction-footer">
-            <div><span className="footer-kicker">Projected from</span><strong>{model ? model.manifest.sampleCount.toLocaleString() : '5,000'} faces</strong></div>
-            <div><span className="footer-kicker">Variance retained</span><strong>{variance ? `${(variance * 100).toFixed(1)}%` : '—'}</strong></div>
+            <div className="dimensions-metric">
+              <span className="footer-kicker">Dimensions</span>
+              <div
+                className={`dimensions-control${dimensionsOpen ? ' is-open' : ''}`}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) setDimensionsOpen(false);
+                }}
+              >
+                <button
+                  type="button"
+                  className="dimensions-trigger"
+                  aria-expanded={dimensionsOpen}
+                  aria-label={`${dimensions} ${dimensions === 1 ? 'dimension' : 'dimensions'}. Adjust reconstruction dimensions`}
+                  onFocus={() => setDimensionsOpen(true)}
+                  onClick={() => setDimensionsOpen((open) => !open)}
+                >
+                  {dimensions}
+                </button>
+                <div className="dimensions-slider-shell">
+                  <span>1</span>
+                  <Slider
+                    aria-label="Number of principal components used in the reconstruction"
+                    min={1}
+                    max={model?.manifest.maxDimensions ?? 1000}
+                    step={1}
+                    value={[dimensions]}
+                    disabled={!model}
+                    onValueChange={(next) => {
+                      const nextValue = Array.isArray(next) ? next[0] : next;
+                      setDimensions(Math.round(nextValue));
+                    }}
+                  />
+                  <span>{model?.manifest.maxDimensions ?? 1000}</span>
+                </div>
+              </div>
+            </div>
+            <div className="variance-metric"><span className="footer-kicker">Variance retained</span><strong>{variance ? `${(variance * 100).toFixed(1)}%` : '—'}</strong></div>
             <Button type="button" variant="ghost" size="sm" className="reset-button" onClick={reset} disabled={!model || !hasChanges}>
               <RotateCcw aria-hidden="true" /> Reset weights
             </Button>
