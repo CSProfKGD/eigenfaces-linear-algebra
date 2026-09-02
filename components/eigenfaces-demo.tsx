@@ -194,12 +194,21 @@ export function EigenfacesDemo() {
           </div>
 
           <div className="reconstruction-footer">
+            <div className="variance-metric"><span className="footer-kicker">Variance retained</span><strong>{variance ? `${(variance * 100).toFixed(1)}%` : '—'}</strong></div>
             <div className="dimensions-metric">
               <span className="footer-kicker">Dimensions</span>
               <div
                 className={`dimensions-control${dimensionsOpen ? ' is-open' : ''}`}
                 onBlur={(event) => {
                   if (!event.currentTarget.contains(event.relatedTarget)) setDimensionsOpen(false);
+                }}
+                onPointerLeave={(event) => {
+                  if (event.pointerType !== 'mouse') return;
+                  const focusedElement = document.activeElement;
+                  if (focusedElement instanceof HTMLElement && event.currentTarget.contains(focusedElement)) {
+                    focusedElement.blur();
+                  }
+                  setDimensionsOpen(false);
                 }}
               >
                 <button
@@ -230,7 +239,6 @@ export function EigenfacesDemo() {
                 </div>
               </div>
             </div>
-            <div className="variance-metric"><span className="footer-kicker">Variance retained</span><strong>{variance ? `${(variance * 100).toFixed(1)}%` : '—'}</strong></div>
             <Button type="button" variant="ghost" size="sm" className="reset-button" onClick={reset} disabled={!model || !hasChanges}>
               <RotateCcw aria-hidden="true" /> Reset weights
             </Button>
