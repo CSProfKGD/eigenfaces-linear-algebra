@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { reconstructFace } from '@/lib/eigenfaces';
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+const assetPath = (path: string) => `${BASE_PATH}${path}`;
+
 type ComponentRecord = {
   index: number;
   eigenvalue: number;
@@ -96,13 +99,13 @@ export function EigenfacesDemo() {
     let cancelled = false;
     async function loadModel() {
       try {
-        const manifestResponse = await fetch('/eigenfaces/manifest.json');
+        const manifestResponse = await fetch(assetPath('/eigenfaces/manifest.json'));
         if (!manifestResponse.ok) throw new Error('The eigenspace is unavailable.');
         const manifest = (await manifestResponse.json()) as Manifest;
         const [baseline, prefixReconstructions, ...vectors] = await Promise.all([
-          fetchFloat32(manifest.baseline),
-          fetchUint8(manifest.prefixReconstructions),
-          ...manifest.components.map((component) => fetchFloat32(component.vector)),
+          fetchFloat32(assetPath(manifest.baseline)),
+          fetchUint8(assetPath(manifest.prefixReconstructions)),
+          ...manifest.components.map((component) => fetchFloat32(assetPath(component.vector))),
         ]);
         const expectedLength = manifest.width * manifest.height;
         if (
@@ -187,7 +190,7 @@ export function EigenfacesDemo() {
           </figcaption>
 
           <div className="reconstruction-stage">
-            {!model && !error && <Image className="reconstruction-fallback" src="/eigenfaces/reconstruction.png" alt="Grayscale preview of the reconstructed input portrait" width={128} height={128} priority unoptimized />}
+            {!model && !error && <Image className="reconstruction-fallback" src={assetPath('/eigenfaces/reconstruction.png')} alt="Grayscale preview of the reconstructed input portrait" width={128} height={128} priority unoptimized />}
             <canvas ref={canvasRef} className={model ? 'reconstruction-canvas is-ready' : 'reconstruction-canvas'} width={model?.manifest.width ?? 128} height={model?.manifest.height ?? 128} role="img" aria-label="PCA reconstruction of the supplied portrait" />
             <div className="scan-line" aria-hidden="true" />
             {error && <div className="model-error" role="alert"><span>Eigenspace unavailable</span><small>{error}</small></div>}
@@ -249,7 +252,7 @@ export function EigenfacesDemo() {
             <div className="basis-heading"><h2 id="basis-title">Principal components</h2></div>
             <div className="component-grid">
               <figure className="component-tile mean-tile">
-                <Image src="/eigenfaces/mean.png" alt="Average face across the FFHQ training sample" width={128} height={128} unoptimized />
+                <Image src={assetPath('/eigenfaces/mean.png')} alt="Average face across the FFHQ training sample" width={128} height={128} unoptimized />
                 <figcaption><span>Mean</span></figcaption>
               </figure>
 
@@ -268,7 +271,7 @@ export function EigenfacesDemo() {
                       setActiveTile(null);
                     }}
                   >
-                    <Image src={component.thumbnail} alt={`Eigenface for principal component ${component.index}`} width={128} height={128} unoptimized />
+                    <Image src={assetPath(component.thumbnail)} alt={`Eigenface for principal component ${component.index}`} width={128} height={128} unoptimized />
                     <figcaption>
                       <span className={`label-${component.labelTones.name}`}>PC {String(component.index).padStart(2, '0')}</span>
                       <small className={`label-${component.labelTones.variance}`}>{(component.explainedVariance * 100).toFixed(1)}%</small>
