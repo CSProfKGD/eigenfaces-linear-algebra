@@ -16,7 +16,7 @@ The eventual site is for non-commercial educational use. Follow the FFHQ attribu
 - The right side contains a balanced 3 × 3 tile grid: the average face first, followed by eigenfaces 1–8 in decreasing explained-variance order.
 - The average-face tile is informational and never presents a weight control.
 - The eight eigenface tiles are the only exposed component controls. The reconstruction itself must use the larger basis selected by the offline pipeline; never reconstruct from only the eight visible components.
-- On narrow screens, present the reconstruction first, then the hero and component grid. Reflow the grid without horizontal scrolling.
+- On narrow screens, present the hero first at the top-left, followed by the reconstruction and component grid. Reflow the grid without horizontal scrolling.
 
 ## Interaction model
 
@@ -53,7 +53,7 @@ The eventual site is for non-commercial educational use. Follow the FFHQ attribu
 - Use semantic headings, buttons, figures, and native range inputs.
 - Give every slider an accessible name that includes its component number and describes that it changes the reconstruction.
 - Make hover-only information equally available through keyboard focus and touch.
-- Preserve visible, high-contrast focus indicators and a logical reading/tab order: reconstruction, hero context, average face, components 1–8, reset.
+- Preserve visible, high-contrast focus indicators and a logical reading/tab order: hero context, reconstruction, average face, components 1–8, reset.
 - Provide text alternatives for the average face, each eigenface, and the reconstructed output without claiming the output identifies the subject.
 - Maintain usable targets and legible values at mobile sizes and at 200% zoom.
 

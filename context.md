@@ -17,7 +17,7 @@ The page is an interaction-led educational working surface. It should let a visi
 
 ### Responsive layout
 
-- At narrow widths, order the content as reconstruction, hero, then component grid.
+- At narrow widths, order the content as hero, reconstruction, then component grid.
 - Reflow the component grid from three columns to two and then one when tile size or label legibility would otherwise suffer.
 - Never introduce horizontal page scrolling.
 - A revealed slider must stay inside its tile and remain usable without obscuring the component label or weight value.

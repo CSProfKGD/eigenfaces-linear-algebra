@@ -129,6 +129,11 @@ export function EigenfacesDemo() {
     <main className="eigenfaces-page">
       <div className="ambient-glow" aria-hidden="true" />
       <section className="experience-grid" aria-label="Interactive eigenfaces reconstruction">
+        <header className="hero-block">
+          <h1>Eigenfaces</h1>
+          <p>Face It: It’s Just Linear Algebra</p>
+        </header>
+
         <figure className="reconstruction-figure">
           <figcaption className="figure-topline">
             <span className="eyebrow">Reconstruction</span>
@@ -150,11 +155,6 @@ export function EigenfacesDemo() {
             </Button>
           </div>
         </figure>
-
-        <header className="hero-block">
-          <h1>Eigenfaces</h1>
-          <p>Face It: It’s Just Linear Algebra</p>
-        </header>
 
         <section className="basis-section" aria-labelledby="basis-title">
             <div className="basis-heading"><h2 id="basis-title">Principal components</h2><p>Hover. Focus. Reshape.</p></div>
