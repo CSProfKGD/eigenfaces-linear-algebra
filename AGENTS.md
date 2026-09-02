@@ -12,8 +12,8 @@ The eventual site is for non-commercial educational use. Follow the FFHQ attribu
 
 - Keep the primary working surface visible in the first desktop viewport.
 - The left side contains one large reconstructed-face stage.
-- The upper-right hero reads `Eigenfaces` with the subtitle `Face It: It’s Just Linear Algebra`.
-- Beneath the hero, the right side contains a balanced 3 × 3 tile grid: the average face first, followed by eigenfaces 1–8 in decreasing explained-variance order.
+- The upper-left hero reads `Eigenfaces` with the subtitle `Face It: It’s Just Linear Algebra`.
+- The right side contains a balanced 3 × 3 tile grid: the average face first, followed by eigenfaces 1–8 in decreasing explained-variance order.
 - The average-face tile is informational and never presents a weight control.
 - The eight eigenface tiles are the only exposed component controls. The reconstruction itself must use the larger basis selected by the offline pipeline; never reconstruct from only the eight visible components.
 - On narrow screens, present the reconstruction first, then the hero and component grid. Reflow the grid without horizontal scrolling.

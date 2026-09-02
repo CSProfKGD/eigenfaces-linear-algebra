@@ -8,10 +8,10 @@ The page is an interaction-led educational working surface. It should let a visi
 
 - Use one continuous black stage aligned to a shared content grid.
 - Allocate the larger left region to a square reconstructed-face figure.
-- Place the hero at the top of the right region:
+- Place the hero at the top of the left region:
   - Title: `Eigenfaces`
   - Subtitle: `Face It: It’s Just Linear Algebra`
-- Place a 3 × 3 grid below the hero. Reading order is `Mean`, `PC 01`, `PC 02`, …, `PC 08`.
+- Place a 3 × 3 grid in the right region. Reading order is `Mean`, `PC 01`, `PC 02`, …, `PC 08`.
 - The reconstruction is visually dominant. Component tiles remain large enough for facial structures and positive/negative lobes to be recognizable.
 - The mean tile uses the same visual framing as the eigenface tiles but has no slider or hover affordance.
 
@@ -192,7 +192,7 @@ The exact serialization may follow the generated site scaffold, but the logical 
 
 ### Interface
 
-- The desktop first viewport contains the dominant reconstruction, top-right hero, and all nine component-grid tiles at the target reference size.
+- The desktop first viewport contains the dominant reconstruction, top-left hero, and all nine component-grid tiles at the target reference size.
 - Mean is first and noninteractive; PC 01–08 follow in correct variance order.
 - Hover, keyboard focus, and touch can each reveal and operate every component slider.
 - Tile enlargement does not cause layout shift or clipping of focus indicators.

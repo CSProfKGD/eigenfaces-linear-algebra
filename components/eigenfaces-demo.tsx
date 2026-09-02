@@ -151,14 +151,13 @@ export function EigenfacesDemo() {
           </div>
         </figure>
 
-        <div className="basis-column">
-          <header className="hero-block">
-            <p className="hero-index">PCA / 01</p>
-            <h1>Eigenfaces</h1>
-            <p>Face It: It’s Just Linear Algebra</p>
-          </header>
+        <header className="hero-block">
+          <p className="hero-index">PCA / 01</p>
+          <h1>Eigenfaces</h1>
+          <p>Face It: It’s Just Linear Algebra</p>
+        </header>
 
-          <section className="basis-section" aria-labelledby="basis-title">
+        <section className="basis-section" aria-labelledby="basis-title">
             <div className="basis-heading"><h2 id="basis-title">Principal components</h2><p>Hover. Focus. Reshape.</p></div>
             <div className="component-grid">
               <figure className="component-tile mean-tile">
@@ -206,8 +205,7 @@ export function EigenfacesDemo() {
                 </div>
               ))}
             </div>
-          </section>
-        </div>
+        </section>
       </section>
 
       <footer className="page-footer">

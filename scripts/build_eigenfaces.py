@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 import requests
 import pyarrow.ipc as arrow_ipc
-from PIL import Image
+from PIL import Image, ImageOps
 from sklearn.decomposition import PCA
 
 SEED = 20260902
@@ -25,6 +25,12 @@ SIZE = 128
 SAMPLE_COUNT = 5000
 MAX_COMPONENTS = 512
 CHECKPOINTS = (128, 256, 512)
+PORTRAIT_LANDMARKS = {
+    "eyeLeft": [423.0, 449.0],
+    "eyeRight": [586.0, 465.0],
+    "mouthLeft": [409.0, 599.0],
+    "mouthRight": [574.0, 612.0],
+}
 
 
 def md5_file(path: Path) -> str:
@@ -185,22 +191,56 @@ def save_gray(path: Path, values: np.ndarray) -> None:
     image.save(path, optimize=True)
 
 
-def align_portrait(source_path: Path, cache: Path) -> np.ndarray:
+def align_portrait(source_path: Path, cache: Path) -> tuple[np.ndarray, np.ndarray]:
     with Image.open(source_path) as source:
-        image = source.convert("RGB")
-    # Manual landmark correction recorded for this fixed supplied portrait:
-    # eye line is approximately +4.5 degrees and face center is near (457, 500).
-    image = image.rotate(-4.5, resample=Image.Resampling.BICUBIC, center=(457, 500))
-    image = image.crop((80, 80, 834, 834)).resize(
-        (SIZE, SIZE), Image.Resampling.LANCZOS
+        image = ImageOps.exif_transpose(source).convert("RGB")
+
+    # Manually verified landmarks for this fixed supplied portrait. Coordinates
+    # follow FFHQ's 68-point convention: eye centers and mouth corners.
+    eye_left = np.array(PORTRAIT_LANDMARKS["eyeLeft"], dtype=np.float64)
+    eye_right = np.array(PORTRAIT_LANDMARKS["eyeRight"], dtype=np.float64)
+    mouth_left = np.array(PORTRAIT_LANDMARKS["mouthLeft"], dtype=np.float64)
+    mouth_right = np.array(PORTRAIT_LANDMARKS["mouthRight"], dtype=np.float64)
+
+    eye_avg = (eye_left + eye_right) * 0.5
+    eye_to_eye = eye_right - eye_left
+    mouth_avg = (mouth_left + mouth_right) * 0.5
+    eye_to_mouth = mouth_avg - eye_avg
+
+    # This is the quadrilateral construction from FFHQ's published align_face.py.
+    # It standardizes roll, scale, and vertical placement jointly rather than
+    # rotating and cropping as two unrelated operations.
+    x_axis = eye_to_eye - np.flipud(eye_to_mouth) * np.array([-1.0, 1.0])
+    x_axis /= np.hypot(*x_axis)
+    x_axis *= max(np.hypot(*eye_to_eye) * 2.0, np.hypot(*eye_to_mouth) * 1.8)
+    y_axis = np.flipud(x_axis) * np.array([-1.0, 1.0])
+    center = eye_avg + eye_to_mouth * 0.1
+    quad = np.stack(
+        [
+            center - x_axis - y_axis,
+            center - x_axis + y_axis,
+            center + x_axis + y_axis,
+            center + x_axis - y_axis,
+        ]
     )
+
+    # Transform at high resolution before the final Lanczos reduction so the
+    # 128px training convention does not introduce avoidable resampling noise.
+    transform_size = 1024
+    image = image.transform(
+        (transform_size, transform_size),
+        Image.Transform.QUAD,
+        tuple((quad + 0.5).reshape(-1)),
+        Image.Resampling.BICUBIC,
+    ).resize((SIZE, SIZE), Image.Resampling.LANCZOS)
     aligned_path = cache / "aligned-input.png"
     aligned_path.parent.mkdir(parents=True, exist_ok=True)
     image.save(aligned_path, optimize=True)
     rgb = np.asarray(image, dtype=np.float32) / 255.0
-    return (
+    grayscale = (
         rgb[..., 0] * 0.2126 + rgb[..., 1] * 0.7152 + rgb[..., 2] * 0.0722
     ).astype(np.float32)
+    return grayscale, quad
 
 
 def write_float32(path: Path, values: np.ndarray) -> str:
@@ -277,7 +317,8 @@ def main() -> None:
             k_full = checkpoint
             break
 
-    portrait = align_portrait(args.portrait, args.cache).reshape(-1)
+    portrait_image, alignment_quad = align_portrait(args.portrait, args.cache)
+    portrait = portrait_image.reshape(-1)
     centered = portrait - pca.mean_.astype(np.float32)
     weights = components[:k_full] @ centered
     baseline = pca.mean_.astype(np.float32) + components[:k_full].T @ weights
@@ -343,9 +384,9 @@ def main() -> None:
         "reconstruction": "/eigenfaces/reconstruction.png",
         "components": component_records,
         "portraitAlignment": {
-            "rotationDegrees": -4.5,
-            "rotationCenter": [457, 500],
-            "crop": [80, 80, 834, 834],
+            "method": "FFHQ eye/mouth-oriented quadrilateral",
+            "landmarks": PORTRAIT_LANDMARKS,
+            "quad": alignment_quad.tolist(),
             "sourceSize": [914, 1003],
         },
     }
