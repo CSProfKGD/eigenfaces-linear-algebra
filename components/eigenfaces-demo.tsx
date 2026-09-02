@@ -137,7 +137,6 @@ export function EigenfacesDemo() {
         <figure className="reconstruction-figure">
           <figcaption className="figure-topline">
             <span className="eyebrow">Reconstruction</span>
-            <span className="model-status">{model ? `${model.manifest.kFull} dimensions` : 'Building eigenspace'}</span>
           </figcaption>
 
           <div className="reconstruction-stage">
