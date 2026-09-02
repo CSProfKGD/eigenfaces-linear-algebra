@@ -35,6 +35,20 @@ PORTRAIT_LANDMARKS = {
 }
 
 
+def optimal_text_tone(image: np.ndarray, x_start: int, x_end: int) -> str:
+    """Choose black or white text from mean WCAG relative luminance."""
+    samples = np.clip(image[5:18, x_start:x_end], 0.0, 1.0)
+    linear = np.where(
+        samples <= 0.04045,
+        samples / 12.92,
+        ((samples + 0.055) / 1.055) ** 2.4,
+    )
+    luminance = float(np.mean(linear))
+    dark_contrast = (luminance + 0.05) / 0.05
+    light_contrast = 1.05 / (luminance + 0.05)
+    return "dark" if dark_contrast >= light_contrast else "light"
+
+
 def md5_file(path: Path) -> str:
     digest = hashlib.md5()
     with path.open("rb") as handle:
@@ -370,6 +384,10 @@ def main() -> None:
                 "vector": f"/eigenfaces/{vector_path.name}",
                 "vectorSha256": write_float32(vector_path, vector),
                 "thumbnail": f"/eigenfaces/{thumbnail_path.name}",
+                "labelTones": {
+                    "name": optimal_text_tone(thumbnail, 5, 47),
+                    "variance": optimal_text_tone(thumbnail, 82, 123),
+                },
             }
         )
 

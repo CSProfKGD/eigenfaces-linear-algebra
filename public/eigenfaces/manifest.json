@@ -1035,7 +1035,8 @@
       "baselineZ": 0.6207596063613892,
       "vector": "/eigenfaces/pc-01.f32",
       "vectorSha256": "53a38e21632f86565aecf9df1a5775bd13c184e55a8ee39186a4877d8d2b0c72",
-      "thumbnail": "/eigenfaces/pc-01.png"
+      "thumbnail": "/eigenfaces/pc-01.png",
+      "labelTones": { "name": "dark", "variance": "dark" }
     },
     {
       "index": 2,
@@ -1045,7 +1046,8 @@
       "baselineZ": 1.244160771369934,
       "vector": "/eigenfaces/pc-02.f32",
       "vectorSha256": "9341a006b8a0428ebbdf8fbb9dadcc5ee0dcd99a8c4d22d424f4594fc0742eb8",
-      "thumbnail": "/eigenfaces/pc-02.png"
+      "thumbnail": "/eigenfaces/pc-02.png",
+      "labelTones": { "name": "light", "variance": "dark" }
     },
     {
       "index": 3,
@@ -1055,7 +1057,8 @@
       "baselineZ": -0.956538200378418,
       "vector": "/eigenfaces/pc-03.f32",
       "vectorSha256": "2cbb05a7959eb4d6540ec378b843e92275bb436d4a66054da99a354e1cec2b4a",
-      "thumbnail": "/eigenfaces/pc-03.png"
+      "thumbnail": "/eigenfaces/pc-03.png",
+      "labelTones": { "name": "dark", "variance": "dark" }
     },
     {
       "index": 4,
@@ -1065,7 +1068,8 @@
       "baselineZ": -0.4092792272567749,
       "vector": "/eigenfaces/pc-04.f32",
       "vectorSha256": "49fc78e4b6c1a3c36fb581aff214e05113b781e2ce6c299bdd02aeacf1a8d341",
-      "thumbnail": "/eigenfaces/pc-04.png"
+      "thumbnail": "/eigenfaces/pc-04.png",
+      "labelTones": { "name": "dark", "variance": "dark" }
     },
     {
       "index": 5,
@@ -1075,7 +1079,8 @@
       "baselineZ": -0.6941330432891846,
       "vector": "/eigenfaces/pc-05.f32",
       "vectorSha256": "f58cbcc3bebd398cfbee200973b93c8ce3cdb7135e3a1d71273d8f42c8772a9e",
-      "thumbnail": "/eigenfaces/pc-05.png"
+      "thumbnail": "/eigenfaces/pc-05.png",
+      "labelTones": { "name": "dark", "variance": "dark" }
     },
     {
       "index": 6,
@@ -1085,7 +1090,8 @@
       "baselineZ": 0.5622552037239075,
       "vector": "/eigenfaces/pc-06.f32",
       "vectorSha256": "f415665076875d877074ce2084dcf9ebb0ebe1f6458dfbda3f4f27891ffbf829",
-      "thumbnail": "/eigenfaces/pc-06.png"
+      "thumbnail": "/eigenfaces/pc-06.png",
+      "labelTones": { "name": "light", "variance": "dark" }
     },
     {
       "index": 7,
@@ -1095,7 +1101,8 @@
       "baselineZ": -0.04143746197223663,
       "vector": "/eigenfaces/pc-07.f32",
       "vectorSha256": "7590369e03c0f03dea5a714a3a0849401514e750c1a2570eb3d2f6baa9fa76e1",
-      "thumbnail": "/eigenfaces/pc-07.png"
+      "thumbnail": "/eigenfaces/pc-07.png",
+      "labelTones": { "name": "dark", "variance": "dark" }
     },
     {
       "index": 8,
@@ -1105,7 +1112,8 @@
       "baselineZ": 0.7104551196098328,
       "vector": "/eigenfaces/pc-08.f32",
       "vectorSha256": "f068c3682f11728a13cfdb241bdce7ab53a8153e05f4570c4e50cc598427bf80",
-      "thumbnail": "/eigenfaces/pc-08.png"
+      "thumbnail": "/eigenfaces/pc-08.png",
+      "labelTones": { "name": "light", "variance": "dark" }
     }
   ],
   "portraitAlignment": {

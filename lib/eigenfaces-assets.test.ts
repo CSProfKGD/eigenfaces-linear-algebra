@@ -10,6 +10,9 @@ type Manifest = {
   width: number;
   height: number;
   cumulativeExplainedVariance: number[];
+  components: Array<{
+    labelTones: { name: string; variance: string };
+  }>;
 };
 
 const manifest = JSON.parse(
@@ -36,5 +39,13 @@ describe('dimension-prefix assets', () => {
     expect(manifest.cumulativeExplainedVariance[999]).toBeGreaterThan(
       manifest.cumulativeExplainedVariance[511],
     );
+  });
+
+  it('stores an independently computed contrast tone for both component labels', () => {
+    expect(manifest.components).toHaveLength(8);
+    for (const component of manifest.components) {
+      expect(['dark', 'light']).toContain(component.labelTones.name);
+      expect(['dark', 'light']).toContain(component.labelTones.variance);
+    }
   });
 });

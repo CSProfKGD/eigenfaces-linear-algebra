@@ -33,6 +33,7 @@ The page is an interaction-led educational working surface. It should let a visi
 - Use a restrained 6px corner radius on the reconstruction and face tiles.
 - Reveal a translucent control surface over the lower half of an active tile. Preserve enough of the eigenface above and around it to connect the control to the image.
 - Use a native range input. Pointer and touch changes update the reconstruction immediately.
+- Determine the component name and variance-label colors independently from their thumbnail corner regions. Convert the sampled sRGB pixels to WCAG relative luminance, compare black-versus-white contrast, store the winning `light` or `dark` tone in the asset manifest, and add a restrained opposite-tone shadow so both labels remain legible over local eigenface texture.
 - Display weights in standard-deviation units for human readability: `z_i = w_i / sqrt(lambda_i)`. The stored calculation continues to use raw PCA weights.
 - Each slider spans `z_i,baseline - 3` through `z_i,baseline + 3`, which is equivalent to raw weight bounds `w_i,baseline ± 3 sqrt(lambda_i)`.
 - The reset control restores all eight exposed raw weights to their baseline values in one state update.
@@ -133,6 +134,7 @@ The exact serialization may follow the generated site scaffold, but the logical 
 - baseline reconstruction payload path and checksum;
 - mean-face display asset path and checksum;
 - component records 1–8, each with eigenvalue, baseline raw weight, baseline standardized weight, raw eigenvector payload path, display-thumbnail path, and checksums;
+- independent WCAG-derived light/dark contrast tones for each component's name and variance label;
 - portrait preprocessing metadata sufficient to reproduce its alignment without embedding the original image;
 - pipeline version and deterministic seed.
 

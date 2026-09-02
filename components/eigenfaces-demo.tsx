@@ -16,6 +16,10 @@ type ComponentRecord = {
   baselineZ: number;
   vector: string;
   thumbnail: string;
+  labelTones: {
+    name: 'dark' | 'light';
+    variance: 'dark' | 'light';
+  };
 };
 
 type Manifest = {
@@ -255,7 +259,10 @@ export function EigenfacesDemo() {
                     }}
                   >
                     <Image src={component.thumbnail} alt={`Eigenface for principal component ${component.index}`} width={128} height={128} unoptimized />
-                    <figcaption><span>PC {String(component.index).padStart(2, '0')}</span><small>{(component.explainedVariance * 100).toFixed(1)}%</small></figcaption>
+                    <figcaption>
+                      <span className={`label-${component.labelTones.name}`}>PC {String(component.index).padStart(2, '0')}</span>
+                      <small className={`label-${component.labelTones.variance}`}>{(component.explainedVariance * 100).toFixed(1)}%</small>
+                    </figcaption>
                     <button
                       type="button"
                       className="tile-activator"
