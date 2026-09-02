@@ -250,7 +250,7 @@ export function EigenfacesDemo() {
             <div className="component-grid">
               <figure className="component-tile mean-tile">
                 <Image src="/eigenfaces/mean.png" alt="Average face across the FFHQ training sample" width={128} height={128} unoptimized />
-                <figcaption><span>Mean</span><small>μ</small></figcaption>
+                <figcaption><span>Mean</span></figcaption>
               </figure>
 
               {(model?.manifest.components ?? []).map((component, index) => {

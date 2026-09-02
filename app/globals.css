@@ -389,7 +389,6 @@ button, input { font: inherit; }
   }
 }
 .mean-tile { border-color: rgba(246, 201, 39, 0.22); }
-.mean-tile figcaption small { color: rgba(246, 201, 39, 0.85); font-size: 13px; text-transform: none; }
 .loading-tile { display: grid; place-items: end start; padding: 9px 10px; color: var(--quiet-ink); font-size: 9px; letter-spacing: 0.13em; }
 .loading-face { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 46%, #8b8d8c 0 25%, #282b2b 26% 40%, #090a0a 55%); opacity: 0.36; }
 @media (min-width: 901px) and (max-height: 900px) {

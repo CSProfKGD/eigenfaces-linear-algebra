@@ -17,6 +17,7 @@ The page is an interaction-led educational working surface. It should let a visi
 - Keep the reconstruction topline limited to its section label. Below the image, show matching two-line metric blocks on one row: `Variance retained` above its percentage first, then `Dimensions` above its interactive numeric value. Their label and value rows must share exact heights and baselines. Remove the redundant `Projected from 5,000 faces` footer metric. The dimensions slider is absolutely positioned into the free space to the right of the numeric value and does not participate in footer layout. Keep its internal track at its final fixed width and on a persistent opacity compositor layer throughout disclosure. Reveal it with a pure dissolve—never width, transform, or clip animation—to prevent Safari from re-snapping the fractional hairline when an animation completes. On pointer devices, it disappears whenever Dimensions is no longer hovered; keyboard focus and touch disclosure remain available.
 - Do not draw a separator beneath the reconstruction metrics; they should resolve directly into the continuous black presentation stage.
 - The mean tile uses the same visual framing as the eigenface tiles but has no slider or hover affordance.
+- Label the average-face tile simply `Mean`; do not add a redundant mathematical μ glyph.
 
 ### Responsive layout
 
