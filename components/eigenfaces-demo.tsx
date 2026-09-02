@@ -283,7 +283,7 @@ export function EigenfacesDemo() {
                       }}
                     />
                     <div className="weight-control">
-                      <div className="weight-readout"><span>Weight</span><output>{value >= 0 ? '+' : ''}{value.toFixed(2)}σ</output></div>
+                      <div className="weight-readout"><span>Weight</span><output>{value >= 0 ? '+' : ''}{value.toFixed(2)}</output></div>
                       <Slider
                         aria-label={`Adjust principal component ${component.index} weight`}
                         min={component.baselineZ - 3}

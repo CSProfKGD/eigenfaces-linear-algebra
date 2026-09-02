@@ -39,7 +39,7 @@ The page is an interaction-led educational working surface. It should let a visi
 - Reveal a translucent control surface over the lower half of an active tile. Preserve enough of the eigenface above and around it to connect the control to the image.
 - Use a native range input. Pointer and touch changes update the reconstruction immediately.
 - Determine the component name and variance-label colors independently from their thumbnail corner regions. Convert the sampled sRGB pixels to WCAG relative luminance, compare black-versus-white contrast, store the winning `light` or `dark` tone in the asset manifest, and add a restrained opposite-tone shadow so both labels remain legible over local eigenface texture.
-- Display weights in standard-deviation units for human readability: `z_i = w_i / sqrt(lambda_i)`. The stored calculation continues to use raw PCA weights.
+- Display weights as signed, unitless numeric values using the standardized coordinate `z_i = w_i / sqrt(lambda_i)`, with `Weight` on the left and no sigma suffix. The stored calculation continues to use raw PCA weights.
 - Each slider spans `z_i,baseline - 3` through `z_i,baseline + 3`, which is equivalent to raw weight bounds `w_i,baseline ± 3 sqrt(lambda_i)`.
 - The reset control restores all eight exposed raw weights to their baseline values in one state update.
 - Keep reset visually discoverable without boxing it: use a clearly legible text label and restrained cyan glyph, with a quieter but still readable disabled state when no weights have changed.
