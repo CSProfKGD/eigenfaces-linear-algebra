@@ -222,11 +222,12 @@ button, input { font: inherit; }
   left: 35px;
 }
 .reconstruction-footer strong { font-size: 13px; font-weight: 520; font-variant-numeric: tabular-nums; line-height: 20px; }
-.reset-button { margin-left: auto; color: var(--soft-ink); font-size: 12px; }
-.reset-button svg { width: 13px; height: 13px; }
+.reset-button { margin-left: auto; color: rgba(245, 245, 247, 0.78); font-size: 12px; font-weight: 520; }
+.reset-button svg { width: 14px; height: 14px; color: rgba(53, 200, 237, 0.82); }
 .reset-button:hover { color: var(--ink); background: rgba(245,245,247,0.07); }
 .reset-button:focus-visible { outline: 1px solid var(--cyan); outline-offset: 2px; }
-.reset-button:disabled { opacity: 0.28; }
+.reset-button:disabled { color: rgba(245, 245, 247, 0.52); opacity: 0.72; }
+.reset-button:disabled svg { color: rgba(53, 200, 237, 0.5); }
 
 .hero-block { min-width: 0; text-align: left; }
 .hero-block h1 {

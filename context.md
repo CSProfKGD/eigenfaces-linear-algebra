@@ -40,6 +40,7 @@ The page is an interaction-led educational working surface. It should let a visi
 - Display weights in standard-deviation units for human readability: `z_i = w_i / sqrt(lambda_i)`. The stored calculation continues to use raw PCA weights.
 - Each slider spans `z_i,baseline - 3` through `z_i,baseline + 3`, which is equivalent to raw weight bounds `w_i,baseline ± 3 sqrt(lambda_i)`.
 - The reset control restores all eight exposed raw weights to their baseline values in one state update.
+- Keep reset visually discoverable without boxing it: use a clearly legible text label and restrained cyan glyph, with a quieter but still readable disabled state when no weights have changed.
 - The reconstruction dimensions value reveals a minimal slider on hover, keyboard focus, or tap. It spans 1–1000 in integer steps, defaults to 512, and updates the displayed prefix and actual cumulative explained variance together.
 - Keep the dimensions slider endpoint labels legible at presentation scale: use tabular numerals at no less than 9px with medium-contrast near-white text, while retaining a thin understated track.
 - Give the dimensions disclosure enough vertical clearance for its thumb and focus ring; its horizontal reveal mask must not clip the circular control above or below.
