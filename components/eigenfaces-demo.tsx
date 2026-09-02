@@ -152,7 +152,6 @@ export function EigenfacesDemo() {
         </figure>
 
         <header className="hero-block">
-          <p className="hero-index">PCA / 01</p>
           <h1>Eigenfaces</h1>
           <p>Face It: It’s Just Linear Algebra</p>
         </header>
@@ -208,10 +207,6 @@ export function EigenfacesDemo() {
         </section>
       </section>
 
-      <footer className="page-footer">
-        <p>Average face + weighted directions of variation = reconstruction.</p>
-        <a href="/eigenfaces/ATTRIBUTION.txt" target="_blank" rel="noreferrer">FFHQ · Data &amp; credits</a>
-      </footer>
     </main>
   );
 }
