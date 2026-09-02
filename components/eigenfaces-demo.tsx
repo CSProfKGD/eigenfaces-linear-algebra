@@ -245,6 +245,14 @@ export function EigenfacesDemo() {
                   <figure
                     className={`component-tile control-tile${activeTile === index ? ' is-active' : ''}`}
                     key={component.index}
+                    onPointerLeave={(event) => {
+                      if (event.pointerType !== 'mouse') return;
+                      const focusedElement = document.activeElement;
+                      if (focusedElement instanceof HTMLElement && event.currentTarget.contains(focusedElement)) {
+                        focusedElement.blur();
+                      }
+                      setActiveTile(null);
+                    }}
                   >
                     <Image src={component.thumbnail} alt={`Eigenface for principal component ${component.index}`} width={128} height={128} unoptimized />
                     <figcaption><span>PC {String(component.index).padStart(2, '0')}</span><small>{(component.explainedVariance * 100).toFixed(1)}%</small></figcaption>

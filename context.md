@@ -27,7 +27,7 @@ The page is an interaction-led educational working surface. It should let a visi
 
 - PC tiles enlarge with a small transform on hover or focus; surrounding layout dimensions remain fixed.
 - Hovering a PC tile is the complete desktop activation gesture: it eases larger and dissolves its usable control into view without requiring a click. Keyboard focus provides the same disclosure, while touch uses tap-to-reveal.
-- On pointer devices, leaving every PC tile restores every tile to its normal scale and hides every weight control. There is no persistent clicked state.
+- On pointer devices, leaving a PC tile dissolves its control away and eases it back to normal scale. Mouse-acquired focus must be released on pointer exit so an adjusted slider cannot leave its tile visually active; genuine keyboard focus remains an accessible disclosure state. When no PC tile is hovered or keyboard-focused, every tile is at its default scale and every weight control is hidden.
 - Hover disclosure is exclusive: while one PC tile is hovered, every other component returns to resting scale and hides its control, edge highlight, and shadow, including a previously touch-selected tile. The touch-selected state may return when the pointer leaves the component grid.
 - Keep the structural hairline static while tiles scale. Render interaction emphasis as an opacity-only inset overlay to prevent subpixel boundary artifacts during transform animation.
 - Use a restrained 6px corner radius on the reconstruction and face tiles.
