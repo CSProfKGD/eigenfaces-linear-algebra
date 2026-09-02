@@ -226,7 +226,7 @@ button, input { font: inherit; }
 }
 .reconstruction-footer .dimensions-slider-shell {
   position: absolute;
-  top: -1px;
+  top: -2px;
   left: 52px;
 }
 .reconstruction-footer strong { font-size: 13px; font-weight: 520; font-variant-numeric: tabular-nums; line-height: 20px; }
