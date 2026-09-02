@@ -235,7 +235,13 @@ export function EigenfacesDemo() {
                     disabled={!model}
                     onValueChange={(next) => {
                       const nextValue = Array.isArray(next) ? next[0] : next;
-                      setDimensions(Math.round(nextValue));
+                      const nextDimensions = Math.round(nextValue);
+                      setDimensions(nextDimensions);
+                      setActiveTile((current) => {
+                        if (current === null || !model) return current;
+                        const component = model.manifest.components[current];
+                        return component && component.index <= nextDimensions ? current : null;
+                      });
                     }}
                   />
                   <span>{model?.manifest.maxDimensions ?? 1000}</span>
@@ -258,10 +264,12 @@ export function EigenfacesDemo() {
 
               {(model?.manifest.components ?? []).map((component, index) => {
                 const value = zValues[index] ?? component.baselineZ;
+                const isIncluded = component.index <= dimensions;
                 return (
                   <figure
-                    className={`component-tile control-tile${activeTile === index ? ' is-active' : ''}`}
+                    className={`component-tile control-tile${activeTile === index ? ' is-active' : ''}${isIncluded ? '' : ' is-excluded'}`}
                     key={component.index}
+                    aria-disabled={!isIncluded}
                     onPointerLeave={(event) => {
                       if (event.pointerType !== 'mouse') return;
                       const focusedElement = document.activeElement;
@@ -279,8 +287,11 @@ export function EigenfacesDemo() {
                     <button
                       type="button"
                       className="tile-activator"
-                      aria-label={`Reveal principal component ${component.index} weight control`}
+                      aria-label={isIncluded
+                        ? `Reveal principal component ${component.index} weight control`
+                        : `Principal component ${component.index} is excluded at ${dimensions} dimensions`}
                       aria-expanded={activeTile === index}
+                      disabled={!isIncluded}
                       onClick={() => {
                         if (window.matchMedia('(hover: none)').matches) setActiveTile(index);
                       }}
@@ -293,6 +304,7 @@ export function EigenfacesDemo() {
                         max={component.baselineZ + 3}
                         step={0.01}
                         value={[value]}
+                        disabled={!isIncluded}
                         onValueChange={(next) => {
                           const nextValue = Array.isArray(next) ? next[0] : next;
                           setZValues((current) => current.map((item, itemIndex) => itemIndex === index ? nextValue : item));
