@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import Image from 'next/image';
 
@@ -94,6 +94,9 @@ export function EigenfacesDemo() {
   const [activeTile, setActiveTile] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const renderedValuesRef = useRef<Float32Array | null>(null);
+  const resetAnimationRef = useRef<number | null>(null);
+  const skipNextRenderRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -155,6 +158,14 @@ export function EigenfacesDemo() {
 
   useEffect(() => {
     if (!model || !selectedPrefix || rawWeights.length === 0 || !canvasRef.current) return;
+    if (skipNextRenderRef.current) {
+      skipNextRenderRef.current = false;
+      return;
+    }
+    if (resetAnimationRef.current !== null) {
+      cancelAnimationFrame(resetAnimationRef.current);
+      resetAnimationRef.current = null;
+    }
     const frame = requestAnimationFrame(() => {
       const values = reconstructFace(
         selectedPrefix,
@@ -163,14 +174,61 @@ export function EigenfacesDemo() {
         model.manifest.components.map((component) => component.baselineWeight),
         dimensions,
       );
+      renderedValuesRef.current = values;
       if (canvasRef.current) drawLuminance(canvasRef.current, values, model.manifest.width, model.manifest.height);
     });
     return () => cancelAnimationFrame(frame);
   }, [dimensions, model, rawWeights, selectedPrefix]);
 
-  const reset = useCallback(() => {
-    if (model) setZValues(model.manifest.components.map((component) => component.baselineZ));
-  }, [model]);
+  const reset = () => {
+    if (!model || !selectedPrefix || !canvasRef.current) return;
+
+    const baselineWeights = model.manifest.components.map((component) => component.baselineWeight);
+    const target = reconstructFace(
+      selectedPrefix,
+      model.vectors,
+      baselineWeights,
+      baselineWeights,
+      dimensions,
+    );
+    const start = renderedValuesRef.current ?? target;
+    const baselineZ = model.manifest.components.map((component) => component.baselineZ);
+
+    if (resetAnimationRef.current !== null) cancelAnimationFrame(resetAnimationRef.current);
+    skipNextRenderRef.current = true;
+    setZValues(baselineZ);
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      drawLuminance(canvasRef.current, target, model.manifest.width, model.manifest.height);
+      renderedValuesRef.current = target;
+      resetAnimationRef.current = null;
+      return;
+    }
+
+    const frameValues = new Float32Array(target.length);
+    const startedAt = performance.now();
+    const duration = 440;
+    const animateReset = (now: number) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      for (let pixel = 0; pixel < target.length; pixel += 1) {
+        frameValues[pixel] = start[pixel] + (target[pixel] - start[pixel]) * eased;
+      }
+      if (canvasRef.current) drawLuminance(canvasRef.current, frameValues, model.manifest.width, model.manifest.height);
+      renderedValuesRef.current = frameValues;
+      if (progress < 1) {
+        resetAnimationRef.current = requestAnimationFrame(animateReset);
+      } else {
+        renderedValuesRef.current = target;
+        resetAnimationRef.current = null;
+      }
+    };
+    resetAnimationRef.current = requestAnimationFrame(animateReset);
+  };
+
+  useEffect(() => () => {
+    if (resetAnimationRef.current !== null) cancelAnimationFrame(resetAnimationRef.current);
+  }, []);
 
   const hasChanges = Boolean(model && zValues.some((value, index) => Math.abs(value - model.manifest.components[index].baselineZ) > 0.001));
   const variance = model?.manifest.cumulativeExplainedVariance[dimensions - 1] ?? null;
