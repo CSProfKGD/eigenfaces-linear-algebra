@@ -26,8 +26,10 @@ The page is an interaction-led educational working surface. It should let a visi
 ### Component interaction
 
 - PC tiles enlarge with a small transform on hover or focus; surrounding layout dimensions remain fixed.
-- Clicking a PC tile selects it with a slightly stronger eased scale increase and dissolves its control into view. Selecting another PC eases the previous tile back to rest.
-- Hover disclosure is exclusive: while one PC tile is hovered, every other component control is hidden, including a previously selected tile. The selected control may return when the pointer leaves the component grid.
+- Hovering a PC tile is the complete desktop activation gesture: it eases larger and dissolves its usable control into view without requiring a click. Keyboard focus provides the same disclosure, while touch uses tap-to-reveal.
+- On pointer devices, leaving every PC tile restores every tile to its normal scale and hides every weight control. There is no persistent clicked state.
+- Hover disclosure is exclusive: while one PC tile is hovered, every other component returns to resting scale and hides its control, edge highlight, and shadow, including a previously touch-selected tile. The touch-selected state may return when the pointer leaves the component grid.
+- Keep the structural hairline static while tiles scale. Render interaction emphasis as an opacity-only inset overlay to prevent subpixel boundary artifacts during transform animation.
 - Use a restrained 6px corner radius on the reconstruction and face tiles.
 - Reveal a translucent control surface over the lower half of an active tile. Preserve enough of the eigenface above and around it to connect the control to the image.
 - Use a native range input. Pointer and touch changes update the reconstruction immediately.
@@ -35,6 +37,7 @@ The page is an interaction-led educational working surface. It should let a visi
 - Each slider spans `z_i,baseline - 3` through `z_i,baseline + 3`, which is equivalent to raw weight bounds `w_i,baseline ± 3 sqrt(lambda_i)`.
 - The reset control restores all eight exposed raw weights to their baseline values in one state update.
 - The reconstruction dimensions value reveals a minimal slider on hover, keyboard focus, or tap. It spans 1–1000 in integer steps, defaults to 512, and updates the displayed prefix and actual cumulative explained variance together.
+- Give the dimensions disclosure enough vertical clearance for its thumb and focus ring; its horizontal reveal mask must not clip the circular control above or below.
 
 ## Dataset selection and provenance
 

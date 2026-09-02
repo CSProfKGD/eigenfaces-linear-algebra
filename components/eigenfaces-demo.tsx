@@ -253,8 +253,9 @@ export function EigenfacesDemo() {
                       className="tile-activator"
                       aria-label={`Reveal principal component ${component.index} weight control`}
                       aria-expanded={activeTile === index}
-                      onFocus={() => setActiveTile(index)}
-                      onClick={() => setActiveTile(index)}
+                      onClick={() => {
+                        if (window.matchMedia('(hover: none)').matches) setActiveTile(index);
+                      }}
                     />
                     <div className="weight-control">
                       <div className="weight-readout"><span>Weight</span><output>{value >= 0 ? '+' : ''}{value.toFixed(2)}σ</output></div>
