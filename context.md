@@ -23,6 +23,7 @@ The page is an interaction-led educational working surface. It should let a visi
 - At narrow widths, order the content as hero, reconstruction, then component grid.
 - Reflow the component grid from three columns to two and then one when tile size or label legibility would otherwise suffer.
 - Never introduce horizontal page scrolling.
+- Suppress browser scrollbar chrome on the presentation stage and clip horizontal overflow, while preserving vertical wheel, trackpad, keyboard, and touch scrolling when a short or narrow viewport genuinely requires it.
 - A revealed slider must stay inside its tile and remain usable without obscuring the component label or weight value.
 
 ### Component interaction
