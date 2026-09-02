@@ -258,7 +258,9 @@ export function EigenfacesDemo() {
             <div className="basis-heading"><h2 id="basis-title">Principal components</h2></div>
             <div className="component-grid">
               <figure className="component-tile mean-tile">
-                <Image src={assetPath('/eigenfaces/mean.png')} alt="Average face across the FFHQ training sample" width={128} height={128} unoptimized />
+                <div className="component-surface">
+                  <Image src={assetPath('/eigenfaces/mean.png')} alt="Average face across the FFHQ training sample" width={128} height={128} unoptimized />
+                </div>
                 <figcaption><span>Mean</span></figcaption>
               </figure>
 
@@ -279,45 +281,49 @@ export function EigenfacesDemo() {
                       setActiveTile(null);
                     }}
                   >
-                    <Image src={assetPath(component.thumbnail)} alt={`Eigenface for principal component ${component.index}`} width={128} height={128} unoptimized />
+                    <div className="component-surface">
+                      <Image src={assetPath(component.thumbnail)} alt={`Eigenface for principal component ${component.index}`} width={128} height={128} unoptimized />
+                      <button
+                        type="button"
+                        className="tile-activator"
+                        aria-label={isIncluded
+                          ? `Reveal principal component ${component.index} weight control`
+                          : `Principal component ${component.index} is excluded at ${dimensions} dimensions`}
+                        aria-expanded={activeTile === index}
+                        disabled={!isIncluded}
+                        onClick={() => {
+                          if (window.matchMedia('(hover: none)').matches) setActiveTile(index);
+                        }}
+                      />
+                      <div className="weight-control">
+                        <div className="weight-readout"><span>Weight</span><output>{value >= 0 ? '+' : ''}{value.toFixed(2)}</output></div>
+                        <Slider
+                          aria-label={`Adjust principal component ${component.index} weight`}
+                          min={component.baselineZ - 3}
+                          max={component.baselineZ + 3}
+                          step={0.01}
+                          value={[value]}
+                          disabled={!isIncluded}
+                          onValueChange={(next) => {
+                            const nextValue = Array.isArray(next) ? next[0] : next;
+                            setZValues((current) => current.map((item, itemIndex) => itemIndex === index ? nextValue : item));
+                          }}
+                        />
+                      </div>
+                    </div>
                     <figcaption>
                       <span className={`label-${component.labelTones.name}`}>PC {String(component.index).padStart(2, '0')}</span>
                       <small className={`label-${component.labelTones.variance}`}>{(component.explainedVariance * 100).toFixed(1)}%</small>
                     </figcaption>
-                    <button
-                      type="button"
-                      className="tile-activator"
-                      aria-label={isIncluded
-                        ? `Reveal principal component ${component.index} weight control`
-                        : `Principal component ${component.index} is excluded at ${dimensions} dimensions`}
-                      aria-expanded={activeTile === index}
-                      disabled={!isIncluded}
-                      onClick={() => {
-                        if (window.matchMedia('(hover: none)').matches) setActiveTile(index);
-                      }}
-                    />
-                    <div className="weight-control">
-                      <div className="weight-readout"><span>Weight</span><output>{value >= 0 ? '+' : ''}{value.toFixed(2)}</output></div>
-                      <Slider
-                        aria-label={`Adjust principal component ${component.index} weight`}
-                        min={component.baselineZ - 3}
-                        max={component.baselineZ + 3}
-                        step={0.01}
-                        value={[value]}
-                        disabled={!isIncluded}
-                        onValueChange={(next) => {
-                          const nextValue = Array.isArray(next) ? next[0] : next;
-                          setZValues((current) => current.map((item, itemIndex) => itemIndex === index ? nextValue : item));
-                        }}
-                      />
-                    </div>
                   </figure>
                 );
               })}
 
               {!model && Array.from({ length: 8 }, (_, index) => (
                 <div className="component-tile loading-tile" key={index} aria-hidden="true">
-                  <div className="loading-face" /><span>PC {String(index + 1).padStart(2, '0')}</span>
+                  <div className="component-surface">
+                    <div className="loading-face" /><span>PC {String(index + 1).padStart(2, '0')}</span>
+                  </div>
                 </div>
               ))}
             </div>
