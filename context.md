@@ -15,6 +15,7 @@ The page is an interaction-led educational working surface. It should let a visi
 - Vertically center the component heading and full 3 × 3 grid against the reconstruction figure rather than aligning it to the page top.
 - The reconstruction is visually dominant. Component tiles remain large enough for facial structures and positive/negative lobes to be recognizable.
 - Keep the reconstruction topline limited to its section label. Below the image, show matching two-line metric blocks: `Dimensions` above its interactive numeric value first, then `Variance retained` above its percentage. Remove the redundant `Projected from 5,000 faces` footer metric. The dimensions slider discloses to the right of the numeric value so the two live reconstruction metrics read together from left to right.
+- Do not draw a separator beneath the reconstruction metrics; they should resolve directly into the continuous black presentation stage.
 - The mean tile uses the same visual framing as the eigenface tiles but has no slider or hover affordance.
 
 ### Responsive layout

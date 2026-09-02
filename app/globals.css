@@ -191,7 +191,7 @@ button, input { font: inherit; }
 }
 .model-error { position: absolute; inset: 0; display: grid; place-content: center; gap: 6px; text-align: center; color: var(--soft-ink); }
 .model-error small { color: var(--quiet-ink); }
-.reconstruction-footer { min-height: 61px; gap: 22px; border-bottom: 1px solid var(--faint); }
+.reconstruction-footer { min-height: 61px; gap: 22px; }
 .reconstruction-footer > div { display: grid; gap: 3px; }
 .reconstruction-footer .dimensions-metric { flex: 0 0 auto; }
 .reconstruction-footer .dimensions-control { gap: 10px; }
