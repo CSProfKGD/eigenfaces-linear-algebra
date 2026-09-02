@@ -385,7 +385,24 @@ button, input { font: inherit; }
 .weight-readout output { color: var(--ink); font-size: 10px; font-variant-numeric: tabular-nums; }
 .weight-control [data-slot="slider-track"] { height: 2px; background: rgba(245,245,247,0.2); }
 .weight-control [data-slot="slider-range"] { background: var(--cyan); }
-.weight-control [data-slot="slider-thumb"] { width: 12px; height: 12px; border-color: rgba(255,255,255,0.9); background: #071015; }
+.weight-control [data-slot="slider-thumb"] {
+  width: 12px;
+  height: 12px;
+  border-color: rgba(255,255,255,0.9);
+  background: #071015;
+  box-shadow: none !important;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+.weight-control [data-slot="slider-thumb"]:hover,
+.weight-control [data-slot="slider-thumb"]:focus-visible {
+  border-color: rgba(255,255,255,0.9);
+  box-shadow: none !important;
+  outline: none;
+}
+.weight-control [data-slot="slider-thumb"]:focus-visible,
+.weight-control [data-slot="slider-thumb"]:active {
+  border-color: var(--cyan);
+}
 @media (hover: none) {
   .control-tile.is-active {
     z-index: 6;
